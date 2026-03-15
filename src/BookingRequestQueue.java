@@ -1,34 +1,23 @@
 import java.util.LinkedList;
 import java.util.Queue;
 
-/**
- * CLASS - BookingRequestQueue
- * =====================================================================
- * Use Case 5: Booking Request (First-Come-First-Served)
- * * Description:
- * Manages and orders incoming booking requests using a Queue.
- *
- * @version 5.0
- */
 public class BookingRequestQueue {
-    // Queue to preserve arrival order (FIFO)
-    private Queue<Reservation> requestQueue;
+    private Queue<Reservation> queue = new LinkedList<>();
 
-    public BookingRequestQueue() {
-        this.requestQueue = new LinkedList<>();
+    public void addRequest(Reservation res) {
+        queue.add(res);
     }
 
-    /**
-     * Adds a new reservation request to the queue.
-     */
-    public void addRequest(Reservation reservation) {
-        requestQueue.add(reservation);
-    }
-
-    /**
-     * Returns the current queue of requests.
-     */
+    // FIX: Add this so RoomAllocationService can get the queue
     public Queue<Reservation> getRequestQueue() {
-        return requestQueue;
+        return this.queue;
+    }
+
+    public boolean isEmpty() {
+        return queue.isEmpty();
+    }
+
+    public Reservation poll() {
+        return queue.poll();
     }
 }

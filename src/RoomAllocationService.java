@@ -1,39 +1,31 @@
-import java.util.*;
+import java.util.Map;
+import java.util.Queue;
 
 public class RoomAllocationService {
-    // DECLARE the variable here
-    private Map<String, Set<String>> assignedRoomsByType;
 
-    public RoomAllocationService() {
-        assignedRoomsByType = new HashMap<>(); // Initialize it
-        assignedRoomsByType.put("Single Room", new HashSet<>());
-        assignedRoomsByType.put("Double Room", new HashSet<>());
-        assignedRoomsByType.put("Suite Room", new HashSet<>());
-    }
-
+    // Existing method for bulk processing
     public void processAllocations(BookingRequestQueue queueManager, RoomInventory inventory) {
         Queue<Reservation> queue = queueManager.getRequestQueue();
-        // Ensure this method exists in RoomInventory
-        Map<String, Integer> roomCounts = inventory.getRoomAvailability();
-
-        System.out.println("Room Allocation Processing");
-
         while (!queue.isEmpty()) {
-            Reservation request = queue.poll();
-            String type = request.getRoomType();
-            String fullTypeKey = type + " Room";
+            allocateRoom(queue.poll(), inventory);
+        }
+    }
 
-            int currentCount = roomCounts.getOrDefault(fullTypeKey, 0);
+    // FIX: Add/Ensure this method exists for the Multi-threaded Use Case 11
+    public void allocateRoom(Reservation request, RoomInventory inventory) {
+        if (request == null) return;
 
-            if (currentCount > 0) {
-                // Now the compiler will FIND "assignedRoomsByType"
-                String roomId = type + "-" + (100 + assignedRoomsByType.get(fullTypeKey).size() + 1);
+        String type = request.getRoomType();
+        String fullTypeKey = type + " Room";
+        Map<String, Integer> availability = inventory.getRoomAvailability();
 
-                assignedRoomsByType.get(fullTypeKey).add(roomId);
-                roomCounts.put(fullTypeKey, currentCount - 1);
-
-                System.out.println("Booking confirmed for Guest: " + request.getGuestName() + ", Room ID: " + roomId);
-            }
+        if (availability.getOrDefault(fullTypeKey, 0) > 0) {
+            availability.put(fullTypeKey, availability.get(fullTypeKey) - 1);
+            System.out.println("Booking confirmed for Guest: " + request.getGuestName() +
+                    ", Room ID: " + type + "-1"); // Simplified ID for demo
+        } else {
+            System.out.println("Booking failed for Guest: " + request.getGuestName() +
+                    " (No " + type + " rooms left)");
         }
     }
 }
